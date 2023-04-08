@@ -1,0 +1,79 @@
+<html>
+  <style>
+    *{
+      font-size:5vw;
+    }
+  </style>
+  <body>
+    <p>points:<div id="pt">0</div></p>
+    <p>What is element which has atomic number of <div id="tex">THIS</div></p>
+    <input id="outp" oninput="inp()">
+    <button onclick="subm()">enter</button>
+    <p id="ans">Enter answer above</p>
+  </body>
+  <script>
+  var question=document.getElementById("tex");
+  var output=document.getElementById("outp");
+  var chemical;
+  var answer,answer2;
+  var ans=document.getElementById("ans");
+  var tchem=0;
+  var quest;
+  var point=0;
+  var xmlhttp = new XMLHttpRequest();
+  //alert(xmlhttp);
+  function getJSONData(filename) {
+    
+    xmlhttp.open('GET', filename, true);
+    xmlhttp.setRequestHeader("Content-type", "application/json", true);
+    xmlhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == "200") {
+            var mksData = JSON.parse(this.responseText);
+            chemical=mksData;
+            //alert(JSON.stringify(chemical));
+            tchem=mksData.elem.total;
+            setQuest();
+          
+        }
+    };
+    xmlhttp.send(null);
+}
+
+function setQuest(){
+  quest=chemical["elem"]["c"+Math.floor(1+Math.random()*tchem)];
+  question.innerText=quest.an;
+  answer=quest.ff;
+  answer2=quest.sf;
+}
+function addPoint(pt){
+  point+=pt;
+document.getElementById("pt").innerText=point;
+}
+  function start(){
+    getJSONData("chemistry/chemical.json");
+    
+  }
+    function subm(){
+    //  alert(output+" "+quest);
+if(output.value===answer||output.value===answer2.toLowerCase()){
+        addPoint(10);
+        ans.innerText="correct";
+      }else{
+        addPoint(-5);
+        ans.innerText="Wrong,the answer was "+answer+"||"+answer2;
+      }
+     // output.value="";
+      setQuest();
+    }
+    function inp(){
+      var ttex=output.value.search(",");
+      if(ttex!==-1){
+        output.value=output.value.slice(0,output.value.length-1);
+        subm();
+        output.value="";
+      }
+    }
+    start();
+
+  </script>
+</html>
